@@ -1,6 +1,7 @@
 #include "bfsarchive.hpp"
 #include "bfsformat.hpp"
 #include "stringpool.hpp"
+#include "bfsfilecompressed.hpp"
 
 #include <vector>
 #include <cassert>
@@ -75,6 +76,8 @@ BFSArchive::BFSArchive( PHYSFS_Io& io )
       continue;
     }
 
+    if( !compressed ) std::cout << filename << " is uncompressed." << std::endl;
+
     m_root.insert( std::move( filename ), {
       offset,
       compressedSize,
@@ -84,7 +87,7 @@ BFSArchive::BFSArchive( PHYSFS_Io& io )
   }
 }
 
-void BFSArchive::Directory::insert( std::string&& filename, FileInfo&& file )
+void BFSArchive::Directory::insert( std::string&& filename, BFSFile::Info&& file )
 {
   auto slashPos = filename.find( '/' );
   if( slashPos == std::string::npos )
@@ -125,9 +128,9 @@ void BFSArchive::enumerateFiles( std::string dirname, PHYSFS_EnumFilesCallback c
 
 BFSFile* BFSArchive::openRead( const std::string& filename )
 {
-  // TODO
-  ( void )filename;
-  return nullptr;
+  BFSFile::Info* info = lookup( filename ).second;
+  if( !info ) return nullptr;
+  return info->compressed ? new BFSFileCompressed( *this, info ) : new BFSFile( *this, info );
 }
 
 bool BFSArchive::stat( const std::string& filename, PHYSFS_Stat& stat )
@@ -152,7 +155,7 @@ bool BFSArchive::stat( const std::string& filename, PHYSFS_Stat& stat )
   return false;
 }
 
-std::pair< BFSArchive::Directory*, BFSArchive::FileInfo* > BFSArchive::lookup( std::string filename )
+std::pair< BFSArchive::Directory*, BFSFile::Info* > BFSArchive::lookup( std::string filename )
 {
   Directory* targetDir = &m_root;
   if( !filename.empty() && filename != "/" ) // root dir
@@ -172,7 +175,7 @@ std::pair< BFSArchive::Directory*, BFSArchive::FileInfo* > BFSArchive::lookup( s
   {
     return std::make_pair( targetDir, nullptr );
   }
-  std::pair< Directory*, FileInfo* > result{ nullptr, nullptr };
+  std::pair< Directory*, BFSFile::Info* > result{ nullptr, nullptr };
   // Look for Directory
   {
     auto entry = targetDir->dirs.find( filename );

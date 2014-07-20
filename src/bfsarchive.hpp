@@ -8,6 +8,8 @@
 #include <memory>
 #include <utility>
 
+#include "bfsfile.hpp"
+
 class BFSFile;
 
 class BFSArchive
@@ -27,24 +29,17 @@ public:
   PHYSFS_Io& getIO() { return m_io; }
 
 private:
-  struct FileInfo
-  {
-    std::uint32_t offset;
-    std::uint32_t compressedSize;
-    std::uint32_t uncompressedSize;
-    bool compressed;
-  };
 
   struct Directory
   {
     std::map< std::string, std::unique_ptr< Directory > > dirs;
-    std::map< std::string, FileInfo > files;
+    std::map< std::string, BFSFile::Info > files;
 
-    void insert( std::string&& filename, FileInfo&& file );
+    void insert( std::string&& filename, BFSFile::Info&& file );
   };
 
 private:
-  std::pair< Directory*, FileInfo* > lookup( std::string filename );
+  std::pair< Directory*, BFSFile::Info* > lookup( std::string filename );
 
 private:
   PHYSFS_Io& m_io;

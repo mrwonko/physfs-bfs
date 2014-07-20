@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <string>
+#include <fstream>
 
 void recursiveDir( const std::string& dir, unsigned indent )
 {
@@ -75,6 +76,53 @@ int main( int argc, char** argv )
     std::cerr << "Could not mount " << mountFile << "! " << PHYSFS_getLastError() << std::endl;
     return 1;
   }
+
+  if( argc > 2 )
+  {
+    auto file = PHYSFS_openRead( argv[ 2 ] );
+    if( !file )
+    {
+      std::cerr << "Error opening " << argv[ 2 ] << ": " << PHYSFS_getLastError() << std::endl;
+    }
+    else
+    {
+      std::string outFilename( argv[ 2 ] );
+      for( char& c : outFilename )
+      {
+        if( c == '/' || c == '\\' ) c = ',';
+      }
+      std::ofstream outFile( outFilename.c_str(), std::ios::binary );
+      if( !outFile.fail() )
+      {
+        PHYSFS_sint64 bytesRead = 0;
+        char buffer[ 1024 ];
+        bool error = false;
+        while( ( bytesRead = PHYSFS_readBytes( file, buffer, sizeof( buffer ) ) ) > 0 )
+        {
+          if( bytesRead < sizeof( buffer ) && !PHYSFS_eof( file ) )
+          {
+            std::cerr << "Error reading from " << argv[ 2 ] << ": " << PHYSFS_getLastError() << std::endl;
+            error = true;
+            break;
+          }
+          outFile.write( buffer, bytesRead );
+          if( outFile.fail() )
+          {
+            std::cerr << "Error writing to " << outFilename << "!" << std::endl;
+            error = true;
+            break;
+          }
+        }
+        if( !error )
+        {
+          std::cout << "Unpacked " << argv[ 2 ] << " to " << outFilename << std::endl;
+        }
+      }
+      PHYSFS_close( file );
+    }
+  }
+
+  return 0;
 
   std::cout << "Files in " << mountFile << ":" << std::endl;
   recursiveDir( "", 1 );

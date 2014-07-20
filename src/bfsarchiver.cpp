@@ -15,7 +15,7 @@ extern "C" static void* openArchive( PHYSFS_Io* io, const char* name, int forWri
   }
   catch( PHYSFS_ErrorCode code )
   {
-    PHYSFS_setErrorCode( code );
+    if( code ) PHYSFS_setErrorCode( code );
     return nullptr;
   }
 }
@@ -29,7 +29,7 @@ extern "C" static void closeArchive( void* opaque )
   }
   catch( PHYSFS_ErrorCode code )
   {
-    PHYSFS_setErrorCode( code );
+    if( code ) PHYSFS_setErrorCode( code );
   }
 }
 
@@ -42,7 +42,7 @@ extern "C" static void enumerateFiles( void* opaque, const char* dirname, PHYSFS
   }
   catch( PHYSFS_ErrorCode code )
   {
-    PHYSFS_setErrorCode( code );
+    if( code ) PHYSFS_setErrorCode( code );
   }
 }
 
@@ -56,7 +56,7 @@ extern "C" static PHYSFS_Io* openRead( void* opaque, const char* filename )
   }
   catch( PHYSFS_ErrorCode code )
   {
-    PHYSFS_setErrorCode( code );
+    if( code ) PHYSFS_setErrorCode( code );
     return nullptr;
   }
 }
@@ -88,7 +88,7 @@ extern "C" static int stat( void* opaque, const char* filename, PHYSFS_Stat* sta
   }
   catch( PHYSFS_ErrorCode code )
   {
-    PHYSFS_setErrorCode( code );
+    if( code ) PHYSFS_setErrorCode( code );
     return 0;
   }
 }

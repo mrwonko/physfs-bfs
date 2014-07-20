@@ -83,6 +83,7 @@
     <ClCompile Include="src\bfsarchive.cpp" />
     <ClCompile Include="src\bfsarchiver.cpp" />
     <ClCompile Include="src\bfsfile.cpp" />
+    <ClCompile Include="src\bfsfilecompressed.cpp" />
     <ClCompile Include="src\bitstream.cpp" />
     <ClCompile Include="src\huffmann.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -92,6 +93,7 @@
     <ClInclude Include="src\bfsarchive.hpp" />
     <ClInclude Include="src\bfsarchiver.h" />
     <ClInclude Include="src\bfsfile.hpp" />
+    <ClInclude Include="src\bfsfilecompressed.hpp" />
     <ClInclude Include="src\bfsformat.hpp" />
     <ClInclude Include="src\bitstream.hpp" />
     <ClInclude Include="src\huffmann.hpp" />
