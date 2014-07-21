@@ -31,15 +31,14 @@ public:
   PHYSFS_Io* getPhysFSInterface() { return &m_ioInterface; }
 
   PHYSFS_sint64 read( char buf[], const PHYSFS_uint64 len );
-  int seek( PHYSFS_uint64 position );
-  PHYSFS_sint64 tell() const { return m_filepos; }
+  virtual int seek( PHYSFS_uint64 position );
+  virtual PHYSFS_sint64 tell() const { return m_phyiscalPos; }
   PHYSFS_sint64 size() const { return m_info->uncompressedSize; };
 
   virtual BFSFile* clone() const { return new BFSFile( *this ); }
 
-private:
+protected:
   virtual PHYSFS_sint64 readImpl( char buf[], const PHYSFS_uint64 len );
-  virtual int seekImpl( PHYSFS_uint64 position );
 
 private:
   /// PhysFS Interface to this File
@@ -49,6 +48,6 @@ protected:
   PHYSFS_Io* m_archive;
   /// I/o position in archive where this file starts
   Info* m_info;
-  /// Logical position in file (as returned by tell())
-  PHYSFS_sint64 m_filepos;
+  /// Physical position in file
+  PHYSFS_sint64 m_phyiscalPos;
 };

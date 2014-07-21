@@ -129,7 +129,11 @@ void BFSArchive::enumerateFiles( std::string dirname, PHYSFS_EnumFilesCallback c
 BFSFile* BFSArchive::openRead( const std::string& filename )
 {
   BFSFile::Info* info = lookup( filename ).second;
-  if( !info ) return nullptr;
+  if( !info )
+  {
+    PHYSFS_setErrorCode( PHYSFS_ERR_NOT_FOUND );
+    return nullptr;
+  }
   return info->compressed ? new BFSFileCompressed( *this, info ) : new BFSFile( *this, info );
 }
 

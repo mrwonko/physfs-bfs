@@ -88,6 +88,7 @@
     <ClCompile Include="src\huffmann.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\stringpool.cpp" />
+    <ClCompile Include="src\zipstream.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\bfsarchive.hpp" />
@@ -97,7 +98,9 @@
     <ClInclude Include="src\bfsformat.hpp" />
     <ClInclude Include="src\bitstream.hpp" />
     <ClInclude Include="src\huffmann.hpp" />
+    <ClInclude Include="src\physfs_miniz.hpp" />
     <ClInclude Include="src\stringpool.hpp" />
+    <ClInclude Include="src\zipstream.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

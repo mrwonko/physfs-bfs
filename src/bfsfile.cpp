@@ -135,7 +135,7 @@ BFSFile::BFSFile( const BFSFile& rhs )
 : m_ioInterface( initFileIO( this ) )
 , m_archive( rhs.m_archive ? rhs.m_archive->duplicate( rhs.m_archive ) : nullptr )
 , m_info( rhs.m_info )
-, m_filepos( rhs.m_filepos )
+, m_phyiscalPos( rhs.m_phyiscalPos )
 {
   // duplicate returned nullptr?
   if( !m_archive && !rhs.m_archive )
@@ -149,7 +149,7 @@ BFSFile::BFSFile( BFSFile&& rhs )
 : m_ioInterface( initFileIO( this ) )
 , m_archive( rhs.m_archive )
 , m_info( rhs.m_info )
-, m_filepos( rhs.m_filepos )
+, m_phyiscalPos( rhs.m_phyiscalPos )
 {
   rhs.m_archive = nullptr;
 }
@@ -175,7 +175,7 @@ BFSFile& BFSFile::operator=( const BFSFile& rhs )
   }
 
   m_info = rhs.m_info;
-  m_filepos = rhs.m_filepos;
+  m_phyiscalPos = rhs.m_phyiscalPos;
 
   return *this;
 }
@@ -190,7 +190,7 @@ BFSFile& BFSFile::operator=( BFSFile&& rhs )
   rhs.m_archive = nullptr;
 
   m_info = rhs.m_info;
-  m_filepos = rhs.m_filepos;
+  m_phyiscalPos = rhs.m_phyiscalPos;
 
   return *this;
 }
@@ -198,36 +198,28 @@ BFSFile& BFSFile::operator=( BFSFile&& rhs )
 PHYSFS_sint64 BFSFile::read( char buf[], const PHYSFS_uint64 len )
 {
   if( !m_archive ) return -1;
-  
-  auto bytesRead = readImpl( buf, std::min< PHYSFS_uint64 >( m_info->uncompressedSize - m_filepos, len ) );
-  if( bytesRead > 0 ) m_filepos += bytesRead;
-  return bytesRead;
-}
 
-int BFSFile::seek( PHYSFS_uint64 position )
-{
-  if( !m_archive ) return false;
-  if( position >= m_info->uncompressedSize ) throw PHYSFS_ERR_PAST_EOF;
-  return seekImpl( position );
+  auto bytesRead = readImpl( buf, std::min< PHYSFS_uint64 >( m_info->uncompressedSize - m_phyiscalPos, len ) );
+  if( bytesRead > 0 ) m_phyiscalPos += bytesRead;
+  return bytesRead;
 }
 
 PHYSFS_sint64 BFSFile::readImpl( char buf[], const PHYSFS_uint64 len )
 {
-  assert( !m_info->compressed );
   return m_archive->read( m_archive, buf, len );
 }
 
-int BFSFile::seekImpl( PHYSFS_uint64 position )
+int BFSFile::seek( PHYSFS_uint64 position )
 {
-  assert( !m_info->compressed );
+  if( position >= m_info->compressedSize ) throw PHYSFS_ERR_PAST_EOF;
   if( m_archive->seek( m_archive, m_info->offset + position ) )
   {
-    m_filepos = position;
+    m_phyiscalPos = position;
     return true;
   }
   else
   {
-    m_filepos = m_archive->tell( m_archive );
+    m_phyiscalPos = m_archive->tell( m_archive );
     return false;
   }
 }

@@ -121,11 +121,11 @@ int main( int argc, char** argv )
       PHYSFS_close( file );
     }
   }
-
-  return 0;
-
-  std::cout << "Files in " << mountFile << ":" << std::endl;
-  recursiveDir( "", 1 );
+  else
+  {
+    std::cout << "Files in " << mountFile << ":" << std::endl;
+    recursiveDir( "", 1 );
+  }
 
   return 0;
 }
