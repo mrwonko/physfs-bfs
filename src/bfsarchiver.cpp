@@ -1,3 +1,4 @@
+#define PHYSFS_BFS_INTERNAL
 #include "bfsarchiver.h"
 #include "bfsarchive.hpp"
 #include "bfsfile.hpp"
